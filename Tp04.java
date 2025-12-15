@@ -228,169 +228,272 @@ public class Tp04 {
 
 	public static void main(String[] args) {
 		// A FAIRE (60) : code
-		Outils.Aleatoire.setSeed(9531); // Outils.Aleatoire.setSeed(9531);
+		Outils.Aleatoire.setSeed(9531);
 		int nombreCases = 9; // Nombre de cases à remplir par partie, maximum 20
 		char choix;
-		boolean pointageBase = true, tuileClassique = true; 
+		boolean pointageBase = true, tuileClassique = true;
 		int record, scoreTotal, maxSuite;
-
 		Scanner cl = new Scanner(System.in);
-		int[] tableauPoint = {0, 1, 3, 5, 7, 9, 11, 15, 20, 25, 30, 35, 40, 50, 60, 70, 85, 100, 150, 300};
-		// Déclarer un tableau pour les points et l'initialiser avec les points de base inscrits sur la feuille de pointage disponible dans l'énoncé
+		int[] tableauPoint = { 0, 1, 3, 5, 7, 9, 11, 15, 20, 25, 30, 35, 40, 50, 60, 70, 85, 100, 150, 300 };
 		int[] tableauTuile = genereTableauTuiles(tuileClassique);
-		// Déclarer un tableau de tuiles et l'initialiser en appelant genereTableauTuiles()
 		int[] tableauCase = new int[nombreCases];
-		// Déclarer et initialiser un tableau de taille nombreCases pour les cases
-		int[] tableauScore = {}; // Déclarer un tableau pour les scores, sans l'initialiser (sans faire de new)
-		record = 0; // Déclarer d'autres variables, si nécessaire
+		int[] tableauScore;
+		record = 0;
 		do { // Répéter
 			System.out.println("Pointages de (B)ase ou (E)xpert. Pointages actuels :");
 			for (int i = 0; i < tableauPoint.length; ++i) {
-				System.out.print(tableauPoint[i] + ":"); //A FAIRE DES ESPACE!!!!
+				if (i == tableauPoint.length - 1) {
+					System.out.print(String.format("%2d:", tableauPoint[i]));
+				} else {
+					System.out.print(String.format("%2d:", tableauPoint[i]));
+				}
 			}
 			System.out.println("");
 			System.out.println("Tuiles (C)lassiques ou (D)ifférentes. Tuiles actuelles :");
 			for (int i = 0; i < tableauTuile.length; ++i) {
-				System.out.print(tableauTuile[i] + ":"); //A FAIRE DES ESPACE!!!!
+				if (i == tableauTuile.length - 1) {
+					System.out.print(String.format("%2d", tableauTuile[i]));
+				} else {
+					System.out.print(String.format("%2d:", tableauTuile[i]));
+				}
 			}
 			System.out.println("");
 			System.out.println("(I)nscrire les cases ou (J)ouer une partie. Cases actuelles :");
 			for (int i = 0; i < tableauCase.length; ++i) {
-				System.out.print(tableauCase[i] + ":"); //A FAIRE DES ESPACE!!!!
+				if (i == tableauCase.length - 1) {
+					System.out.print(String.format("%2d", tableauCase[i]));
+				} else {
+					System.out.print(String.format("%2d:", tableauCase[i]));
+				}
 			}
 			System.out.println("");
 			System.out.println("Calcul du (S)core obtenu");
 			System.out.println("(Q)uitter");
 			System.out.print("[BCDEIJQS] > ");
-			choix = cl.next().charAt(0); // Afficher le menu et lire le choix de l'usager
-			switch (choix) { // Selon son choix
-				case 'B': // B : appeler ajusteTableauPoints()
+			choix = cl.next().charAt(0);
+			switch (choix) {
+				case 'B':
 					pointageBase = true;
 					ajusteTableauPoints(tableauPoint, pointageBase);
 					break;
-				case 'E': // E : appeler ajusteTableauPoints()
+				case 'E':
 					pointageBase = false;
 					ajusteTableauPoints(tableauPoint, pointageBase);
 					break;
-				case 'C': // C : appeler genereTableauTuiles()
+				case 'C':
 					tuileClassique = true;
-					genereTableauTuiles(tuileClassique);
+					tableauTuile = genereTableauTuiles(tuileClassique);
 					break;
-				case 'D': // D : appeler genereTableauTuiles()
+				case 'D':
 					tuileClassique = false;
+					tableauTuile = genereTableauTuiles(tuileClassique);
 					break;
-				case 'I': // I : appeler inscrireCases()
+				case 'I':
 					inscrireCases(cl, tableauCase);
 					break;
-				case 'J': // J : appeler jouerPartie()
+				case 'J':
 					jouerPartie(cl, tableauTuile, tableauCase);
 					break;
-				case 'S': // S : Calcul du score
-					tableauScore = determineScores(tableauCase, tableauPoint); // Appeler determineScores() et récupérer le tableau des scores
-					scoreTotal = somme(tableauScore); // Appeler somme() pour obtenir le score total
-					maxSuite = maximum(tableauScore); // Appeler maximum() pour avoir la poisition du score maximal pour une suite
-					System.out.println("Total de la partie = " + scoreTotal + "(" + maxSuite + ")"); // Afficher le résultat de la partie
-					if (scoreTotal > record) { // Mise à jour du score record si le joueur a battu son record précédent
-						System.out.print("Bravo, vous avez battu votre record! ");
-						System.out.print("Nouveau score à battre : " + scoreTotal);
-						record = scoreTotal;
+				case 'S':
+					if (tableauCase[0] == 0) {
+						System.out.println("Il n'y a aucun score à determiner");
+					} else {
+						tableauScore = determineScores(tableauCase, tableauPoint);
+						scoreTotal = somme(tableauScore);
+						maxSuite = maximum(tableauScore);
+						System.out.println(genereChaine(tableauCase, " - ", " / ", -1, "__"));
+						System.out.println(genereChaine(tableauScore, "   ", "   ", 0, "  "));
+						System.out.println("Total de la partie = " + scoreTotal + " (" + maxSuite + ")");
+						if (scoreTotal > record) {
+							System.out.println("Bravo, vous avez battu votre record! ");
+							System.out.println(String.format("Nouveau score à battre : %03d", scoreTotal));
+							record = scoreTotal;
+						}
 					}
 					break;
 				default:
-					System.out.println("CHOIX INVALIDE"); // Autre choix : Afficher CHOIX INVALIDE
+					System.out.println("CHOIX INVALIDE");
 			}
-		} while (choix != 'Q' && choix != 'q'); // Tant que le joueur ne choisit pas de quitter
-		System.out.println("Votre record est : " + record); // Afficher le pointage record et saluer le joueur
+		} while (choix != 'Q' && choix != 'q');
+		System.out.println("Votre record est : " + record);
 		System.out.println("Bonne journée");
 	}
 
-	// A FAIRE (9) : code - documentation(/**)
+	/**
+	 * Ajuste le pointage selon la difficulté
+	 * 
+	 * @param points Tableau représentant le pointage selon la longueur de la chaine
+	 * @param base   Difficulté choisie par l'utilisateur
+	 */
 	public static void ajusteTableauPoints(int[] points, boolean base) {
-		// Aucun affichage n'est réalisé par cette procédure
-		// On modifie seulement les trois cases du tableau des points qui varient
-		// selon le type de pointage choisi (voir énoncé).
+		if (base == true) {
+			points[5] = 9;
+			points[11] = 35;
+			points[16] = 85;
+		} else {
+			points[5] = 3;
+			points[11] = 20;
+			points[16] = 50;
+		}
+
 	}
 
-/**
-     * Crée un tableau qui possède des tuiles dont la valeur va de 1 à 30 avec 11 à 19 répété deux fois ou dont la valeur va de 1 à 40
-     * 
-     * @param classique Choix de l'utilisateur selon s'il veut un nombre de tuiles classique ou non.
-     * 
-     * @return Tableau avec les bonnes étiquettes selon le choix de l'utilisateur
-     */
-    public static int[] genereTableauTuiles(boolean classique) {
-        
-        if (classique == true) {
-            int[] tableauTuiles = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,11,12,13,14,15,16,17,18,19};
-        }
-        int[] tableauTuiles = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40};
-        
-        return tableauTuiles;
-    }
+	/**
+	 * Crée un tableau qui possède des tuiles dont la valeur va de 0 à 30 avec 11 à
+	 * 19 répété deux fois ou dont la valeur va de 1 à 40
+	 * 
+	 * @param classique Choix de l'utilisateur selon s'il veut un nombre de tuiles
+	 *                  classique ou non.
+	 * 
+	 * @return Tableau avec les bonnes étiquettes selon le choix de l'utilisateur
+	 */
+	public static int[] genereTableauTuiles(boolean classique) {
+		int[] tableauNombres = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+				24, 25, 26, 27, 28, 29, 30, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
 
-	// A FAIRE (4) : code - documentation(/**)
+		if (classique != true) {
+			for (int i = 0; i < tableauNombres.length; i++) {
+				tableauNombres[i] = i + 1;
+			}
+
+		}
+		return tableauNombres;
+	}
+
+	/**
+	 * Crée un tableau qui possède le nombre de cases d'une partie et l'initialise
+	 * avec les valeurs
+	 * souhaitées par l'utilisateur
+	 * 
+	 * @param cl    Permet à l'utilisateur d'entrer des variables
+	 * @param cases Tableau contenant le nombre de cases qu'on souhaite initialiser
+	 */
 	public static void inscrireCases(Scanner cl, int[] cases) {
-		// AFFICHER("Inscrivez les valeurs des ", taille de cases , " cases : ")
-		// POUR i ALLANT DE 0 À taille du tableau cases - 1 FAIRE
-		// LIRE(cases[i])
-		// FINPOUR
+		System.out.print("Inscrivez les valeurs des " + cases.length + " cases : ");
+		for (int i = 0; i < cases.length; ++i) {
+			cases[i] = cl.nextInt();
+		}
 	}
 
-	// A FAIRE (25) : code - documentation(/**)
+	/**
+	 * Fonction qui joue une partie de Streams
+	 * 
+	 * @param cl     Permet à l'utilisateur d'entrer des variables
+	 * @param tuiles Tableau avec toutes les tuiles qui peuvent être pigés pour le
+	 *               jeu
+	 * @param cases  Tableau contenant le nombre de cases qu'on souhaite initialiser
+	 */
 	public static void jouerPartie(Scanner cl, int[] tuiles, int[] cases) {
 		// Seul tuiles ne doit pas être modifié
 		// Déclarer la variable pos de type int
+		int pos;
+		String melangeFormater;
 		// Déclarer un tableau de type int nommé melange , sans l'initialiser
+		int[] melange;
 		// Initialiser un tableau nommé positions ayant la même taille que le tableau
 		// cases
+		int[] positions = new int[cases.length];
 		// POUR i ALLANT DE 0 À taille du tableau cases - 1 FAIRE
-		// positions[i] <- i + 1
-		// cases[i] <- -1
-		// FINPOUR
+		for (int i = 0; i < cases.length; ++i) {
+			// positions[i] <- i + 1
+			positions[i] = i + 1;
+			// cases[i] <- -1
+			cases[i] = -1;
+			// FINPOUR
+		}
 		// melange <- melangeTuiles(tuiles)
+		melange = melangeTuiles(tuiles);
 		// AFFICHER(genereChaine(positions, " ", " "))
+		for (int i = 0; i < positions.length; ++i) {
+			System.out.print(" " + positions[i] + "   ");
+		}
+		System.out.println("");
 		// POUR i ALLANT DE 0 À taille du tableau cases - 1 FAIRE
-		// AFFICHER(genereChaine(cases, " - ", " - ", -1, "__"), " ~~~ ", melange[i], "?
-		// ")
-		// Vous devez afficher melange[i] sur deux colonnes en utilisant
-		// String.formatted()
-		// LIRE(pos)
-		// pos <- pos - 1
-		// TANT QUE (pos < 0 || pos >= cases.length || cases[pos] != -1) FAIRE
-		// AFFICHER("Cette position est invalide, choisissez-en une autre > ")
-		// LIRE(pos)
-		// pos <- pos - 1
-		// FINTANTQUE
-		// cases[pos] <- melange[i]
-		// FINPOUR
+		for (int i = 0; i < cases.length; i++) {
+			// AFFICHER(genereChaine(cases, " - ", " - ", -1, "__"), " ~~~ ", melange[i],
+			// "?")
+			melangeFormater = String.format("%2d", melange[i]);
+			System.out.print(
+					String.format(genereChaine(cases, " - ", " - ", -1, "__") + " ~~~ " + melangeFormater + "? "));
+			// Vous devez afficher melange[i] sur deux colonnes en utilisant
+			// String.formatted()
+			// LIRE(pos)
+			pos = cl.nextInt();
+			// pos <- pos - 1
+			pos = pos - 1;
+			// TANT QUE (pos < 0 || pos >= cases.length || cases[pos] != -1) FAIRE
+			while (pos < 0 || pos >= cases.length || cases[pos] != -1) {
+				// AFFICHER("Cette position est invalide, choisissez-en une autre > ")
+				System.out.print("Cette position est invalide, choisissez-en une autre > ");
+				// LIRE(pos)
+				pos = cl.nextInt();
+				// pos <- pos - 1
+				pos = pos - 1;
+				// FINTANTQUE
+			}
+			// cases[pos] <- melange[i]
+			cases[pos] = melange[i];
+			// FINPOUR
+		}
 		// pos <- trouve(cases, 0)
+		pos = trouve(cases, 0);
 		// SI (pos != -1) ALORS
-		// AFFICHER(genereChaine(cases, " - ", " - ", 0, "**"))
-		// AFFICHER("Quelle valeur doit remplacer le JOKER? ")
-		// LIRE(cases[pos])
-		// FINSI
+		if (pos != -1) {
+			// AFFICHER(genereChaine(cases, " - ", " - ", 0, "**"))
+			System.out.println(genereChaine(cases, " - ", " - ", 0, "**"));
+			// AFFICHER("Quelle valeur doit remplacer le JOKER? ")
+			System.out.print(("Quelle valeur doit remplacer le JOKER? "));
+			// LIRE(cases[pos])
+			cases[pos] = cl.nextInt();
+			// FINSI
+		}
 	}
 
-	// A FAIRE (13) : code - documentation(/**)
+	/**
+	 * Fonction qui determine le nombre de points que chaque suite croissante
+	 * de chiffres rapporte
+	 * 
+	 * @param cases  Tableau contenant les cases initialisées par l'utilisateur
+	 * @param points Tableau contenant les points que chaque suite rapporte
+	 * 
+	 * @return Tableau avec les scores de chaque suite croissante de chiffres
+	 */
 	public static int[] determineScores(int[] cases, int[] points) {
 		// cases et points ne doivent pas être modifiés
 		// Aucun affichage n'est réalisé par cette fonction
-		// Initialiser à zéro un tableau de scores de la même taille que le tableau
-		// cases
-		// Initialiser la longueur de la suite à 1
-		// Pour chaque paire de cases adjacentes, vérifier s'il s'agit de la fin
-		// d'une suite et faire le traitement approprié
-		// Ne pas oublier d'écrire les points obtenus pour la dernière suite
-		return new int[0]; // Retourne le tableau des scores créé
+		int[] scores = new int[cases.length];
+		int longueurSuite = 1;
+		for (int i = 0; i < cases.length; ++i) {
+			if (i + 1 == cases.length) {
+				scores[i] = points[longueurSuite - 1];
+			} else if (cases[i] > cases[i + 1]) {
+				scores[i] = points[longueurSuite - 1];
+				longueurSuite = 1;
+			} else {
+				longueurSuite++;
+			}
+		}
+		return scores;
 	}
 
-	// A FAIRE (10) : code - documentation(/**)
+	/**
+	 * Mélange les valeurs d'un tableau
+	 * 
+	 * @param tuiles Tableau de tuile ordonné
+	 * @return Tableau de tuile mélangé
+	 */
 	public static int[] melangeTuiles(int[] tuiles) {
-		// tuiles ne doit pas être modifié
-		// Aucun affichage n'est réalisé par cette fonction
-		// Lire la documentation de l'énoncé et utiliser Outils.Aleatoire
-		// Indice : Créer un nouveau tableau de tuiles ( clone() ) qui sera mélangé
-		return new int[0]; // Retourne le tableau de tuiles mélangées
+		int[] melangeTuile = tuiles.clone();
+		int temp;
+
+		for (int i = 0; i < melangeTuile.length; i++) {
+			int alea = Outils.Aleatoire.nextInt(melangeTuile.length);
+			temp = melangeTuile[i];
+			melangeTuile[i] = melangeTuile[alea];
+			melangeTuile[alea] = temp;
+
+		}
+		return melangeTuile;
 	}
 
 	/**
@@ -408,37 +511,98 @@ public class Tp04 {
 		return genereChaine(tab, sepC, sepD, Integer.MIN_VALUE, null);
 	}
 
-	// A FAIRE (20) : code - documentation(/**)
+	/**
+	 * Sépare une chaine selon si la chaine a une tendence croissante ou
+	 * décroissante
+	 * 
+	 * @param tab  Tableau à séparer
+	 * @param sepC Indice de portion croissante
+	 * @param sepD Indice de portion décroissante
+	 * @param val  Valeur à remplacer
+	 * @param rem  Symbole de remplacement
+	 * 
+	 * @return Chaine avec symbole indiquant la croissance ou la décroissante d'une
+	 *         portion donnée
+	 */
 	public static String genereChaine(int[] tab, String sepC, String sepD, int val, String rem) {
-		// tab ne doit pas être modifié
-		// Aucun affichage n'est réalisé par cette fonction
-		// Lire la documentation de l'énoncé et utiliser String.formatted()
-		// Indice : Faire un cas spécial pour le premier élément qui ne
-		// doit pas être précédé d'un séparateur
-		return ""; // Retourne une chaîne qui sera affichée par la méthode appelante
+		String chaine = "";
+		String temp = "";
+		for (int i = 0; i < tab.length; i++) {
+			temp = "" + tab[i];
+			if (tab[i] == val) {
+				temp = rem;
+			}
+			if (i == tab.length - 1) { // dernier nombre
+				chaine += String.format("%2s", temp);
+			} else if (tab[i + 1] >= tab[i]) { // si prochain plus grand ou égal
+				chaine += String.format(("%2s" + sepC), temp);
+
+			} else { // si prochain plus petit
+				chaine += String.format(("%2s" + sepD), temp);
+			}
+
+			if ((i + 1) % 20 == 0) {
+				chaine += "\n";
+			}
+
+		}
+		return chaine;
 	}
 
-	// A FAIRE (6) : code - documentation(/**)
+	/**
+	 * Fonction qui prend un tableau et renvoie la somme de toutes ses valeurs
+	 * 
+	 * @param vecteur Tableau dont on souhaite trouver la somme
+	 * 
+	 * @return Somme de toutes les valeurs du tableau
+	 */
 	public static int somme(int[] vecteur) {
-		// vecteur ne doit pas être modifié
-		// Aucun affichage n'est réalisé par cette fonction
-		// Indice : Notes de cours
-		return Integer.MIN_VALUE; // Retourne une valeur
+		int somme = 0;
+
+		for (int i = 0; i < vecteur.length; ++i) {
+			somme += vecteur[i];
+		}
+		return somme;
 	}
 
-	// A FAIRE (8) : code - documentation(/**)
+	/**
+	 * Fonction qui prend un tableau et renvoie sa valeur maximale
+	 * 
+	 * @param vecteur Tableau dont on souhaite trouver la valeur maximale
+	 * 
+	 * @return Valeur maximale du tableau
+	 */
 	public static int maximum(int[] vecteur) {
-		// vecteur ne doit pas être modifié
-		// Aucun affichage n'est réalisé par cette fonction
-		// Indice : Notes de cours
-		return Integer.MIN_VALUE; // Retourne une position
+		int max = 0;
+		for (int i = 0; i < vecteur.length; ++i) {
+			if (vecteur[i] > max) {
+				max = vecteur[i];
+			}
+		}
+		return max;
 	}
 
-	// A FAIRE (9) : code - documentation(/**)
+	/**
+	 * Fonction qui va chercher la première occuration d'une valeur dans un tableau
+	 * et trouver sa position
+	 * 
+	 * @param vecteur tableau doit on cherche une valeur
+	 * @param valeur  valeur recherché
+	 * 
+	 * @return position de la première occuration ou -1 si aucune occuration n'est
+	 *         présente
+	 */
 	public static int trouve(int[] vecteur, int valeur) {
-		// vecteur ne doit pas être modifié
-		// Aucun affichage n'est réalisé par cette fonction
-		// Indice : Notes de cours
-		return Integer.MIN_VALUE; // Retourne une position
+		int i = 0;
+		int occurrence = 0;
+		while (i < vecteur.length && vecteur[i] != valeur) {
+			i++;
+		}
+		if (vecteur[i] == valeur) {
+			occurrence = i;
+		} else {
+			occurrence = -1;
+		}
+		return occurrence;
 	}
 }
